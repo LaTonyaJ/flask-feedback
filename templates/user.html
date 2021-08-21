@@ -1,0 +1,15 @@
+{% extends 'base.html' %} {% block title %}
+<h1 class="display-1">{{user.full_name}}</h1>
+{% endblock %} {% block content %}
+<div>
+  <ul>
+    <li>Username: {{user.username}}</li>
+    <li>Email: {{user.email}}</li>
+  </ul>
+  <ul id="feedback">
+    {% for f in fb %}
+    <li>{{user.f.title}}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}
