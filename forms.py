@@ -32,9 +32,17 @@ class Login(FlaskForm):
                              validators.Length(max=50), InputRequired()])
 
 
-class Feedback(FlaskForm):
+class FeedbackForm(FlaskForm):
 
     title = StringField('Title', validators=[
                         validators.Length(max=100), InputRequired()])
 
     content = TextAreaField('Content', validators=[InputRequired()])
+
+
+class EditFeedbackForm(FlaskForm):
+
+    title = StringField('Title', validators=[
+                        validators.Length(max=100)])
+
+    content = TextAreaField('Content')

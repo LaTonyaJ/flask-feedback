@@ -1,10 +1,11 @@
 from flask.helpers import flash
 from flask.templating import render_template
-from forms import Register, Login, Feedback
+from forms import Register, Login, FeedbackForm, EditFeedbackForm
 from flask import Flask, request, redirect, session
 from werkzeug.utils import redirect
-from models import connect_db, db, User
+from models import connect_db, db, User, Feedback
 from flask_debugtoolbar import DebugToolbarExtension
+import pdb
 
 app = Flask(__name__)
 
@@ -33,7 +34,7 @@ def create_user():
     if form.validate_on_submit():
         first_name = form.first_name.data
         last_name = form.last_name.data
-        username = form.username.data
+        username = form.username.data.lower()
         password = form.password.data
         email = form.email.data
 
@@ -51,10 +52,12 @@ def create_user():
 
 @app.route('/users/<username>')
 def show_user(username):
+
     if "username" in session:
+
         user = User.query.get(username)
-        fb = Feedback.query.get(username)
-        return render_template('user.html', user=user, fb=fb)
+        return render_template('user.html', user=user)
+
     else:
         return redirect('/')
 
@@ -72,7 +75,7 @@ def user_login_form():
         new_user = User.authenticate(username, password)
 
         if new_user:
-            session['username'] = new_user.username
+            session['username'] = new_user.username.lower()
             return redirect(f'/users/{new_user.username}')
         else:
             form.username.errors = ['Invalid username/password']
@@ -95,7 +98,7 @@ def delete_user(username):
 
     user = User.query.get(username)
 
-    if 'username' in session and 'username' == user.username:
+    if 'username' in session and username == user.username:
         db.session.delete(user)
         db.session.commit()
         session.pop('username')
@@ -109,10 +112,9 @@ def delete_user(username):
 @app.route('/users/<username>/feedback/add', methods=['GET', 'POST'])
 def show_feedback_form(username):
 
-    form = Feedback()
-
-    if 'username' in session and 'username' == session['username']:
-
+    form = FeedbackForm()
+    # pdb.set_trace()
+    if 'username' in session and username == session['username']:
         if form.validate_on_submit():
             title = form.title.data
             content = form.content.data
@@ -123,6 +125,43 @@ def show_feedback_form(username):
             db.session.commit()
 
             return redirect(f'/users/{username}')
+        else:
+            return render_template('add_feedback.html', form=form)
 
     else:
         return render_template('add_feedback.html', form=form)
+
+
+@app.route('/feedback/<int:feedback_id>/update', methods=['GET', 'POST'])
+def update_feedback(feedback_id):
+
+    feedback = Feedback.query.get_or_404(feedback_id)
+
+    if 'username' in session and feedback.username == session['username']:
+
+        form = EditFeedbackForm(obj=feedback)
+
+        if form.validate_on_submit():
+            feedback.title = form.title.data
+            feedback.content = form.content.data
+
+            db.session.commit()
+
+            return redirect(f'/users/{feedback.username}')
+
+        return render_template('edit_feedback.html', form=form, feedback=feedback)
+
+
+@app.route('/feedback/<int:feedback_id>/delete', methods=['GET', 'POST'])
+def delete_feedback(feedback_id):
+
+    feedback = Feedback.query.get(feedback_id)
+
+    if 'username' in session and feedback.username == session['username']:
+
+        db.session.delete(feedback)
+        db.session.commit()
+
+        return redirect(f'/users/{feedback.username}')
+
+    return render_template(f'/users/{feedback.username}')

@@ -1,14 +1,33 @@
 {% extends 'base.html' %} {% block title %}
 <h1 class="display-1">{{user.full_name}}</h1>
 {% endblock %} {% block content %}
-<div>
+<div class="user">
   <ul>
     <li>Username: {{user.username}}</li>
     <li>Email: {{user.email}}</li>
   </ul>
+  <h4 class="display-4">Feedback</h4>
   <ul id="feedback">
-    {% for f in fb %}
-    <li>{{user.f.title}}</li>
+    {% for feedback in user.feedback %}
+    <li>
+      {{feedback.content}}
+      <form>
+        <button
+          class="btn btn-outline-success"
+          formmethod="GET"
+          formaction="/feedback/{{feedback.id}}/update"
+        >
+          Edit
+        </button>
+        <button
+          class="btn btn-outline-danger"
+          formmethod="POST"
+          formaction="/feedback/{{feedback.id}}/delete"
+        >
+          X
+        </button>
+      </form>
+    </li>
     {% endfor %}
   </ul>
 </div>

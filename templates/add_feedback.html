@@ -1,4 +1,4 @@
-{% extends 'base.html' %}{% block title %}
+{% extends 'base.html' %} {% block title %}
 <h1 class="display-2">Feedback</h1>
 {% endblock %} {% block content %}
 <form id="add_feedback" method="POST">
@@ -15,7 +15,6 @@
   <div class="col-5">
     {{field.label(class_='form-label')}} {{field(class_='form-control')}}
   </div>
-  <div class="">{% for err in field.errors %} {{err}} {% endfor %}</div>
   {% endfor %}
   <br />
   <button class="btn btn-outline-primary">Submit</button>
