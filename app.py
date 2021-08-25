@@ -22,12 +22,17 @@ debug = DebugToolbarExtension(app)
 
 @app.route('/')
 def show_homepage():
+    """Redirect to register"""
 
     return redirect('/register')
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def create_user():
+    """Register a new user"""
+
+    if 'username' in session:
+        return redirect(f"/users/{session['username']}")
 
     form = Register()
 
@@ -52,6 +57,7 @@ def create_user():
 
 @app.route('/users/<username>')
 def show_user(username):
+    """Display User info"""
 
     if "username" in session:
 
@@ -65,6 +71,9 @@ def show_user(username):
 @app.route('/login', methods=['GET', 'POST'])
 def user_login_form():
     """User login"""
+
+    if 'username' in session:
+        return redirect(f"/users/{session['username']}")
 
     form = Login()
 
@@ -111,6 +120,7 @@ def delete_user(username):
 
 @app.route('/users/<username>/feedback/add', methods=['GET', 'POST'])
 def show_feedback_form(username):
+    """Add Feedback"""
 
     form = FeedbackForm()
     # pdb.set_trace()
@@ -134,6 +144,7 @@ def show_feedback_form(username):
 
 @app.route('/feedback/<int:feedback_id>/update', methods=['GET', 'POST'])
 def update_feedback(feedback_id):
+    """Edit Feedback"""
 
     feedback = Feedback.query.get_or_404(feedback_id)
 
@@ -154,6 +165,7 @@ def update_feedback(feedback_id):
 
 @app.route('/feedback/<int:feedback_id>/delete', methods=['GET', 'POST'])
 def delete_feedback(feedback_id):
+    """Delete Feedback"""
 
     feedback = Feedback.query.get(feedback_id)
 
